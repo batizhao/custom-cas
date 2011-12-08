@@ -1,11 +1,11 @@
-# 说明 ＃
+# 说明 #
 
 这是一个使用 `Maven` 和 `CAS` 实现配置 CAS Server 的项目。
 主要参考 [Best Practice - Setting Up CAS Locally using the Maven2 WAR Overlay Method]
 (https://wiki.jasig.org/display/CASUM/Best+Practice+-+Setting+Up+CAS+Locally+using+the+Maven2+WAR+Overlay+Method)
 这个文档。完成了这个文档中所有的工作，并且实现了 generic 和 jdbc 两个 Authentication 。
 
-## 相关的软件 ##
+## 相关软件 ##
 * cas-server-3 （这里用的是 3.4.11，可以在 pom 中配置）
 * maven3
 * jdk6
@@ -13,7 +13,7 @@
 
 ## 配置 ##
 
-主要内容都可以参考 `Best Practice`，这里只对其中一段做了一点修改。配置 Tomcat 的 HTTPS 。
+主要内容都可以参考 `Best Practice`，这里只对 `配置 Tomcat 的 HTTPS` 做一点修改 。
 
     # keytool -genkey -alias tomcat -keyalg RSA -validity 365 -keystore my.keystore
     输入keystore密码：
