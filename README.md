@@ -1,19 +1,19 @@
 # 说明 ＃
 
-这是一个使用 `Maven` 和 `CAS` 实现自定义 CAS Server 的项目。
-主要参考文档是：[Best Practice - Setting Up CAS Locally using the Maven2 WAR Overlay Method]
+这是一个使用 `Maven` 和 `CAS` 实现配置 CAS Server 的项目。
+主要参考 [Best Practice - Setting Up CAS Locally using the Maven2 WAR Overlay Method]
 (https://wiki.jasig.org/display/CASUM/Best+Practice+-+Setting+Up+CAS+Locally+using+the+Maven2+WAR+Overlay+Method)
-这个项目也完成了这个文档中所有的工作。并且实现了 generic 和 jdbc 两个 Authentication 。
+这个文档。完成了这个文档中所有的工作，并且实现了 generic 和 jdbc 两个 Authentication 。
 
 ## 相关的软件 ##
-cas-server-3
-jdk6
-tomcat7
-maven3
+* cas-server-3 （这里用的是 3.4.11，可以在 pom 中配置）
+* maven3
+* jdk6
+* tomcat7
 
-## 基础工作 ##
+## 配置 ##
 
-主要内容都可以参考 `Best Practice`，这里只对其中一段做了一点修改。打开 Tomcat 的 HTTPS：
+主要内容都可以参考 `Best Practice`，这里只对其中一段做了一点修改。配置 Tomcat 的 HTTPS 。
 
     # keytool -genkey -alias tomcat -keyalg RSA -validity 365 -keystore my.keystore
     输入keystore密码：
@@ -49,12 +49,12 @@ maven3
                clientAuth="false" sslProtocol="TLS"
                keystoreFile="conf/my.keystore" keystorePass="123456"/>
 
-## generic Authentication ##
+## Generic Authentication ##
 
 在 server-generic 模块中，运行 mvn package 之后，把 cas.war 放到 Tomcat 中，使用 scott/secret 登录。
 认证信息在 authenticationHandlers 中配置。
 
-## jdbc Authentication ##
+## JDBC Authentication ##
 
 这个模块对 SearchModeSearchDatabaseAuthenticationHandler 和 QueryDatabaseAuthenticationHandler 都做了配置。
 但默认实现是 QueryDatabaseAuthenticationHandler ，并且对密码做了 MD5 加密。
@@ -72,9 +72,9 @@ maven3
 
 运行 mvn package 之后，把 cas.war 放到 Tomcat 中，使用 admin/123456 登录。
 
-这里对密码做了 MD5 加密，如果在 authenticationHandlers 中去掉 `passwordEncoder` 这个属性，就可以使用明码登录。
+这里对密码 `123456` 做了 MD5 加密，如果在 authenticationHandlers 中去掉 `passwordEncoder` 这个属性，就可以使用明码登录。
 
 ## 参考文档 ##
-[CAS User Manual](https://wiki.jasig.org/display/CASUM/Home)
-[CAS Client](https://wiki.jasig.org/display/CASC/CAS+Client+for+Java+3.1)
+* [CAS User Manual](https://wiki.jasig.org/display/CASUM/Home)
+* [CAS Client](https://wiki.jasig.org/display/CASC/CAS+Client+for+Java+3.1)
 
