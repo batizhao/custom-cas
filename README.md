@@ -11,7 +11,7 @@
 * jdk6
 * tomcat7
 
-## 配置 ##
+## CAS Server 配置 ##
 
 主要内容都可以参考 `Best Practice`，这里只对 `配置 Tomcat 的 HTTPS` 做一点修改 。
 
@@ -35,11 +35,6 @@
 
     输入<tomcat>的主密码
             （如果和 keystore 密码相同，按回车）：
-
-如果要导入 JVM 默认的 keystore，需要执行以下步骤（不是必须）：
-
-    # keytool -export -alias tomcat -file server.crt -keystore my.keystore
-    # keytool -import -file server.crt -keystore $JAVA_HOME/jre/lib/security/cacerts -alias tomcat
 
 修改 Tomcat 的 server.xml 文件(注意这里对 protocol 进行了修改)：
 
@@ -73,6 +68,20 @@
 运行 mvn package 之后，把 cas.war 放到 Tomcat 中，使用 admin/123456 登录。
 
 这里对密码 `123456` 做了 MD5 加密，如果在 authenticationHandlers 中去掉 `passwordEncoder` 这个属性，就可以使用明码登录。
+
+## CAS Client 配置 ##
+
+根据 Server 的 my.keystore 生成客户端证书：
+
+    # keytool -export -alias tomcat -file server.crt -keystore my.keystore
+
+导入 Client JVM 默认的 keystore：
+
+    # keytool -import -file server.crt -keystore $JAVA_HOME/jre/lib/security/cacerts -alias tomcat
+
+测试
+* 分别打开 http://localhost:8080/client-java 或 http://localhost:8080/client-spring ，都被重定向到登录界面。
+* 任意登录其中之一，然后在浏览器直接输入另外一个地址，可以看到已经不需要登录。
 
 ## 参考文档 ##
 * [CAS User Manual](https://wiki.jasig.org/display/CASUM/Home)

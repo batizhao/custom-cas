@@ -9,28 +9,30 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>server-generic</artifactId>
+    <artifactId>client-spring</artifactId>
     <packaging>war</packaging>
-    <name>custom-cas-server-generic</name>
+    <name>Spring client for CAS</name>
 
     <build>
-        <finalName>cas</finalName>
+        <finalName>client-spring</finalName>
     </build>
 
     <dependencies>
         <dependency>
-            <groupId>org.jasig.cas</groupId>
-            <artifactId>cas-server-webapp</artifactId>
-            <version>${cas.version}</version>
-            <type>war</type>
-            <scope>runtime</scope>
+            <groupId>org.jasig.cas.client</groupId>
+            <artifactId>cas-client-core</artifactId>
+            <version>3.2.0</version>
         </dependency>
 
         <dependency>
-            <groupId>org.jasig.cas</groupId>
-            <artifactId>cas-server-support-generic</artifactId>
-            <version>${cas.version}</version>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>3.0.5.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>3.0.5.RELEASE</version>
         </dependency>
     </dependencies>
-
 </project>
