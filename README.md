@@ -80,6 +80,7 @@
     # keytool -import -file server.crt -keystore $JAVA_HOME/jre/lib/security/cacerts -alias tomcat
 
 测试
+
 * 分别打开 http://localhost:8080/client-java 或 http://localhost:8080/client-spring ，都被重定向到登录界面。
 * 任意登录其中之一，然后在浏览器直接输入另外一个地址，可以看到已经不需要登录。
 
