@@ -102,11 +102,11 @@
 
 ## CAS Client 配置 ##
 
-根据 Server 的 my.keystore 生成客户端证书：
+根据 Server 的 my.keystore 导出客户端证书：
 
     # keytool -export -alias tomcat -file server.crt -keystore my.keystore
 
-导入 Client JVM 默认的 keystore：
+导入 Client JVM 默认的 keystore（cacerts 的默认密码是 `changeit`）：
 
     # keytool -import -file server.crt -keystore $JAVA_HOME/jre/lib/security/cacerts -alias tomcat
 
@@ -115,6 +115,74 @@
 * 分别打开 http://localhost:8080/client-java 或 http://localhost:8080/client-spring ，都被重定向到登录界面。
 * 任意登录其中之一，然后在浏览器直接输入另外一个地址，可以看到已经不需要登录。
 * Single Sign Out: https://localhost:8443/cas/logout（Spring 客户端的 logout 好像不起作用，Java 客户端没问题）
+
+## 三台机器 SSO ##
+
+修改 hosts 文件（三台机器都增加以下内容）：
+
+    # CAS Server
+    10.4.251.149 batizhao
+
+    # CAS Client for Java
+    10.4.247.94 client-java
+
+    # CAS Client for Spring
+    10.4.247.95 client-spring
+
+根据域名重新生成证书（在 HTTPS 环境下，只能使用域名，不可以使用 IP）。在使用之前删除原证书（如果 alias 不变）：
+
+    # keytool -delete -keystore $JAVA_HOME/jre/lib/security/cacerts -alias tomcat
+
+参考 `CAS Server 配置` 这一段，使用 `batizhao` 替换 `localhost` 生成新证书，重新导出服务端证书，并导入客户端。
+
+修改 `client-java` web.xml ：
+
+    <filter>
+        <filter-name>CAS Authentication Filter</filter-name>
+        <filter-class>org.jasig.cas.client.authentication.AuthenticationFilter</filter-class>
+        <init-param>
+            <param-name>casServerLoginUrl</param-name>
+            <param-value>https://batizhao:8443/cas/login</param-value>
+        </init-param>
+        <init-param>
+            <param-name>serverName</param-name>
+            <param-value>http://client-java</param-value>
+        </init-param>
+    </filter>
+
+    <filter>
+        <filter-name>CAS Validation Filter</filter-name>
+        <filter-class>org.jasig.cas.client.validation.Cas20ProxyReceivingTicketValidationFilter</filter-class>
+        <init-param>
+            <param-name>casServerUrlPrefix</param-name>
+            <param-value>https://batizhao:8443/cas</param-value>
+        </init-param>
+        <init-param>
+            <param-name>serverName</param-name>
+            <param-value>http://client-java</param-value>
+        </init-param>
+    </filter>
+
+修改 `client-spring` applicationContext.xml ：
+
+    <bean name="authenticationFilter"
+          class="org.jasig.cas.client.authentication.AuthenticationFilter"
+          p:casServerLoginUrl="https://batizhao:8443/cas/login"
+          p:renew="false"
+          p:gateway="false"
+          p:service="http://client-spring/client-spring"/>
+
+    <bean name="validationFilter"
+          class="org.jasig.cas.client.validation.Cas20ProxyReceivingTicketValidationFilter"
+          p:service="http://client-spring/client-spring">
+        <property name="ticketValidator">
+            <bean class="org.jasig.cas.client.validation.Cas20ServiceTicketValidator">
+                <constructor-arg index="0" value="https://batizhao:8443/cas"/>
+            </bean>
+        </property>
+    </bean>
+
+对 jsp 文件稍作修改，在三台机器任意一台登录客户端测试。
 
 ## 参考文档 ##
 * [CAS User Manual](https://wiki.jasig.org/display/CASUM/Home)
