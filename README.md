@@ -3,7 +3,12 @@
 这是一个使用 `Maven` 和 `CAS` 实现配置 CAS Server 的项目。
 主要参考 [Best Practice - Setting Up CAS Locally using the Maven2 WAR Overlay Method]
 (https://wiki.jasig.org/display/CASUM/Best+Practice+-+Setting+Up+CAS+Locally+using+the+Maven2+WAR+Overlay+Method)
-这个文档。完成了这个文档中所有的工作，并且实现了 generic 和 jdbc 两个 Authentication 。
+这个文档。主要内容包括：
+
+* 实现了 generic 和 jdbc 两个 Authentication 。
+* 使用单机完成了两个客户端的 SSO 。
+* 使用多机完成了两个客户端的 SSO 。
+* CAS Server 的管理配置。
 
 ## 相关软件 ##
 * cas-server-3 （这里用的是 3.4.11，可以在 pom 中配置）
@@ -109,6 +114,14 @@
 导入 Client JVM 默认的 keystore（cacerts 的默认密码是 `changeit`）：
 
     # keytool -import -file server.crt -keystore $JAVA_HOME/jre/lib/security/cacerts -alias tomcat
+    
+在 Mac 上，这里的 $JAVA_HOME 可能是：
+
+    /System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home
+    
+查看证书的命令是：
+
+    # keytool -list -keystore $JAVA_HOME/lib/security/cacerts -alias tomcat
 
 测试
 
@@ -183,6 +196,14 @@
     </bean>
 
 对 jsp 文件稍作修改，在三台机器任意一台登录客户端测试。
+
+## CAS Server 的管理配置 ##
+
+从源码中 Copy `cas.properties`（或者项目的 overlays 目录），修改 `prefix` ：  
+
+    server.prefix=https://batizhao:8443/cas
+    
+......    
 
 ## 参考文档 ##
 * [CAS User Manual](https://wiki.jasig.org/display/CASUM/Home)
