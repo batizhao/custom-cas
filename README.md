@@ -207,7 +207,7 @@
 
     mvn clean package    
     
-访问 `https://batizhao:8443/cas/services` ，使用之前使用的帐号密码登录。    
+访问 `https://batizhao:8443/cas/services` ，使用之前的帐号密码登录。    
 
 ## 参考文档 ##
 * [CAS User Manual](https://wiki.jasig.org/display/CASUM/Home)
