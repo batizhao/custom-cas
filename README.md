@@ -44,12 +44,31 @@
                clientAuth="false" sslProtocol="TLS"
                keystoreFile="conf/my.keystore" keystorePass="123456"/>
 
-## Generic Authentication ##
+### Generic Authentication ###
 
-在 server-generic 模块中，运行 mvn package 之后，把 cas.war 放到 Tomcat 中，使用 scott/secret 登录。
+在 server-generic 模块中，从源码中 Copy `deployerConfigContext.xml`（或者项目的 overlays 目录），把其中的以下代码注释：
+
+    <bean class="org.jasig.cas.authentication.handler.support.SimpleTestUsernamePasswordAuthenticationHandler" />
+
+修改为：
+
+    <bean class="org.jasig.cas.adaptors.generic.AcceptUsersAuthenticationHandler">
+        <property name="users">
+            <map>
+                <entry>
+                    <key>
+                        <value>scott</value>
+                    </key>
+                    <value>secret</value>
+                </entry>
+            </map>
+        </property>
+    </bean>
+
+运行 mvn package 之后，把 cas.war 放到 Tomcat 中，使用 scott/secret 登录。
 认证信息在 authenticationHandlers 中配置。
 
-## JDBC Authentication ##
+### JDBC Authentication ###
 
 这个模块对 SearchModeSearchDatabaseAuthenticationHandler 和 QueryDatabaseAuthenticationHandler 都做了配置。
 但默认实现是 QueryDatabaseAuthenticationHandler ，并且对密码做了 MD5 加密。
@@ -69,6 +88,18 @@
 
 这里对密码 `123456` 做了 MD5 加密，如果在 authenticationHandlers 中去掉 `passwordEncoder` 这个属性，就可以使用明码登录。
 
+### 实现 Single Sign Out 后返回到自定义页面 ###
+
+从源码 Copy `cas-servlet.xml` 到 `server-jdbc`，找到以下代码，增加属性 `p:followServiceRedirects="true"`
+
+    <bean id="logoutController" class="org.jasig.cas.web.LogoutController" ... .../>
+
+运行 mvn clean package，重新部署 CAS Server。
+
+客户端 logout 时，使用：
+
+    https://localhost:8443/cas/logout?service=你要跳转的URL
+
 ## CAS Client 配置 ##
 
 根据 Server 的 my.keystore 生成客户端证书：
@@ -83,6 +114,7 @@
 
 * 分别打开 http://localhost:8080/client-java 或 http://localhost:8080/client-spring ，都被重定向到登录界面。
 * 任意登录其中之一，然后在浏览器直接输入另外一个地址，可以看到已经不需要登录。
+* Single Sign Out: https://localhost:8443/cas/logout（Spring 客户端的 logout 好像不起作用，Java 客户端没问题）
 
 ## 参考文档 ##
 * [CAS User Manual](https://wiki.jasig.org/display/CASUM/Home)
