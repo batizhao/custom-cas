@@ -115,11 +115,11 @@
 
     # keytool -import -file server.crt -keystore $JAVA_HOME/lib/security/cacerts -alias tomcat
     
-在 Mac 上，这里的 $JAVA_HOME 可能是：
+在 Mac 上，这里的 `cacerts` 可能是：
 
     /System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home/lib/security/cacerts
     
-在 Win 上，这里的 $JAVA_HOME 可能是：
+在 Win 上，这里的 `cacerts` 可能是：
 
     D:\jdk1.6\jre\lib\security\cacerts
     
