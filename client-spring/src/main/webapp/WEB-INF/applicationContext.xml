@@ -6,7 +6,7 @@
 
     <bean name="authenticationFilter"
           class="org.jasig.cas.client.authentication.AuthenticationFilter"
-          p:casServerLoginUrl="https://localhost:8443/cas/login"
+          p:casServerLoginUrl="http://localhost:8080/cas/login"
           p:renew="false"
           p:gateway="false"
           p:service="http://localhost:8080/client-spring"/>
@@ -16,7 +16,7 @@
           p:service="http://localhost:8080/client-spring">
         <property name="ticketValidator">
             <bean class="org.jasig.cas.client.validation.Cas20ServiceTicketValidator">
-                <constructor-arg index="0" value="https://localhost:8443/cas"/>
+                <constructor-arg index="0" value="http://localhost:8080/cas"/>
             </bean>
         </property>
     </bean>
