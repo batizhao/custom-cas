@@ -111,13 +111,17 @@
 
     # keytool -export -alias tomcat -file server.crt -keystore my.keystore
 
-导入 Client JVM 默认的 keystore（cacerts 的默认密码是 `changeit`）：
+导入 Client JVM 默认的 keystore（客户端 Tomcat 使用的 JVM，cacerts 的默认密码是 `changeit`）：
 
     # keytool -import -file server.crt -keystore $JAVA_HOME/lib/security/cacerts -alias tomcat
     
 在 Mac 上，这里的 $JAVA_HOME 可能是：
 
-    /System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home
+    /System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home/lib/security/cacerts
+    
+在 Win 上，这里的 $JAVA_HOME 可能是：
+
+    D:\jdk1.6\jre\lib\security\cacerts
     
 查看证书的命令是：
 
