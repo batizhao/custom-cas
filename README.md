@@ -146,11 +146,11 @@
     # CAS Client for Spring
     10.4.247.95 client-spring
 
-根据域名重新生成证书（在 HTTPS 环境下，只能使用域名，不可以使用 IP）。在使用之前删除原证书（如果 alias 不变）：
+根据域名重新生成证书（在这里只能使用域名，不可以使用 IP，否则会抛出异常）。在使用之前删除原证书（如果 alias 不变）：
 
     # keytool -delete -keystore $JAVA_HOME/lib/security/cacerts -alias tomcat
 
-参考 `CAS Server 配置` 这一段，使用 `batizhao` 替换 `localhost` 生成新证书，重新导出服务端证书，并导入客户端。
+参考 `CAS Server 配置` 这一段，使用 `batizhao` 替换 `localhost` 生成新证书。参考 `CAS Client 配置` 重新导出服务端证书，并导入客户端。
 
 修改 `client-java` web.xml ：
 
@@ -216,4 +216,5 @@
 ## 参考文档 ##
 * [CAS User Manual](https://wiki.jasig.org/display/CASUM/Home)
 * [CAS Client](https://wiki.jasig.org/display/CASC/CAS+Client+for+Java+3.1)
+* [SSL Troubleshooting and Reference Guide](https://wiki.jasig.org/display/CASUM/SSL+Troubleshooting+and+Reference+Guide)
 
