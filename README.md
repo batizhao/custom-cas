@@ -1,9 +1,9 @@
 # 说明 #
 
-这是一个使用 `Maven` 和 `CAS` 实现配置 CAS Server 的项目。
-主要参考 [Best Practice - Setting Up CAS Locally using the Maven2 WAR Overlay Method]
-(https://wiki.jasig.org/display/CASUM/Best+Practice+-+Setting+Up+CAS+Locally+using+the+Maven2+WAR+Overlay+Method)
-这个文档。主要内容包括：
+这是一个使用 `Maven` 和 `CAS` 定制 CAS 的项目。
+最开始以 [Best Practice - Setting Up CAS Locally using the Maven2 WAR Overlay Method]
+(https://wiki.jasig.org/display/CASUM/Best+Practice+-+Setting+Up+CAS+Locally+using+the+Maven2+WAR+Overlay+Method) 为指导，
+后续又作了很多扩展。主要内容包括：
 
 * 实现了 generic 和 jdbc 两个 Authentication 。
 * 使用单机完成了两个客户端的 SSO 。
