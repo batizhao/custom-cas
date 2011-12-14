@@ -113,7 +113,7 @@
 
 导入 Client JVM 默认的 keystore（cacerts 的默认密码是 `changeit`）：
 
-    # keytool -import -file server.crt -keystore $JAVA_HOME/jre/lib/security/cacerts -alias tomcat
+    # keytool -import -file server.crt -keystore $JAVA_HOME/lib/security/cacerts -alias tomcat
     
 在 Mac 上，这里的 $JAVA_HOME 可能是：
 
@@ -144,7 +144,7 @@
 
 根据域名重新生成证书（在 HTTPS 环境下，只能使用域名，不可以使用 IP）。在使用之前删除原证书（如果 alias 不变）：
 
-    # keytool -delete -keystore $JAVA_HOME/jre/lib/security/cacerts -alias tomcat
+    # keytool -delete -keystore $JAVA_HOME/lib/security/cacerts -alias tomcat
 
 参考 `CAS Server 配置` 这一段，使用 `batizhao` 替换 `localhost` 生成新证书，重新导出服务端证书，并导入客户端。
 
