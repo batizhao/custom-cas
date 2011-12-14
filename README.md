@@ -8,10 +8,12 @@
 * 实现了 generic 和 jdbc 两个 Authentication 。
 * 使用单机完成了两个客户端的 SSO 。
 * 使用多机完成了两个客户端的 SSO 。
-* CAS Server 的管理配置。
+* CAS without SSL
+* CAS Server Management。
 
 ## 相关软件 ##
-* cas-server-3 （这里用的是 3.4.11，可以在 pom 中配置）
+* cas-server-3.4.11
+* cas-client-core 3.2.0
 * maven3
 * jdk6
 * tomcat7
@@ -201,6 +203,39 @@
 
 对 jsp 文件稍作修改，在三台机器任意一台登录客户端测试。
 
+## CAS without SSL ##
+
+之前使用 SSL 证书的时候，单机 CN 是使用 localhost ，多机使用自己定制的机器名或者域名（通过修改 hosts）。 
+
+关于 SSL： 
+
+* HTTPS 是 CAS Server 的默认访问通道，由于考虑到安全性，数据都通过 SSL 通道加密传送。 
+* 使用 HTTPS 时，CA 证书是必须的，而生成证书时的 CN 尤其重要，其他应用访问 CAS Server 的时候也受到 CN 所影响，若不匹配则会报异常。
+* CN 不可以使用 IP，否则会抛出 `java.security.cert.CertificateException: No subject alternative names present`。
+* 在生产环境中，CN 不可以使用 localhost ，因为其他应用访问时也必须以 `https://CN/` 这样的访问限定。 
+* 在内网中，如果没有 DNS Server，只能靠 hosts 作 CN 的域名映射。那每台 CAS Server 和 CAS Client 的 hosts 都必须增加 CN 和 IP 映射条目（甚至包括每个浏览器客户端）。这会带来大量难以预知的问题。 
+* 默认情况下不信任的授权机构生成的 CA 证书必然引起浏览器提示。
+* 如果对安全性要求不高，可能需要去掉 SSL 。
+
+如何去掉 SSL ？
+
+修改 `deployerConfigContext.xml`，找到以下内容，增加属性 `p:requireSecure="false"`：
+
+    <bean class="org.jasig.cas.authentication.handler.support.HttpBasedServiceCredentialsAuthenticationHandler"
+                      p:httpClient-ref="httpClient"/>
+                      
+在 WEB-INF 下增加目录 `spring-configuration`，放入 `ticketGrantingTicketCookieGenerator.xml` 和 `warnCookieGenerator.xml`，
+找到 `p:cookieSecure="true"`，替换为 `p:cookieSecure="false"`。
+
+重新部署 `server-jdbc`
+
+    mvn clean package
+    
+访问 `http://IP:8080/cas/login` ，使用之前的帐号密码可以登录。在登录界面，CAS 会警告 `Non-secure Connection
+You are currently accessing CAS over a non-secure connection. 
+Single Sign On WILL NOT WORK. In order to have single sign on work, 
+you MUST log in over HTTPS.` 这个可以忽略。同时修改所有 Client 的配置，都改为 IP 就可以了。   
+
 ## CAS Server 的管理配置 ##
 
 从源码中 Copy `cas.properties`（或者项目的 overlays 目录），修改 `server.prefix` ：  
@@ -211,7 +246,7 @@
 
     mvn clean package    
     
-访问 `https://batizhao:8443/cas/services` ，使用之前的帐号密码登录。    
+访问 `https://batizhao:8443/cas/services` 。    
 
 ## 参考文档 ##
 * [CAS User Manual](https://wiki.jasig.org/display/CASUM/Home)
