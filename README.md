@@ -8,8 +8,7 @@
 * 实现了 generic 和 jdbc 两个 Authentication 。
 * 使用单机完成了两个客户端的 SSO 。
 * 使用多机完成了两个客户端的 SSO 。
-* CAS without SSL
-* CAS Server Management。
+* CAS without SSL 。
 
 ## 相关软件 ##
 * cas-server-3.4.11
@@ -234,19 +233,7 @@
 访问 `http://IP:8080/cas/login` ，使用之前的帐号密码可以登录。在登录界面，CAS 会警告 `Non-secure Connection
 You are currently accessing CAS over a non-secure connection. 
 Single Sign On WILL NOT WORK. In order to have single sign on work, 
-you MUST log in over HTTPS.` 这个可以忽略。同时修改所有 Client 的配置，都改为 IP 就可以了。   
-
-## CAS Server 的管理配置 ##
-
-从源码中 Copy `cas.properties`（或者项目的 overlays 目录），修改 `server.prefix` ：  
-
-    server.prefix=https://batizhao:8443/cas
-
-重新部署 `server-jdbc`
-
-    mvn clean package    
-    
-访问 `https://batizhao:8443/cas/services` 。    
+you MUST log in over HTTPS.` 这个可以忽略。同时修改所有 Client 的配置，都改为 IP 就可以了。    
 
 ## 参考文档 ##
 * [CAS User Manual](https://wiki.jasig.org/display/CASUM/Home)
