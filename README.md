@@ -5,9 +5,10 @@
 (https://wiki.jasig.org/display/CASUM/Best+Practice+-+Setting+Up+CAS+Locally+using+the+Maven2+WAR+Overlay+Method) 为指导，
 后续又作了很多扩展。主要内容包括：
 
-* 实现了 generic 和 jdbc 两个 Authentication 。
-* 使用单机完成了两个客户端的 SSO 。
-* 使用多机完成了两个客户端的 SSO 。
+* 实现了 Generic(server-generic), Jdbc(server-jdbc) 两种 Authentication 。
+* 实现了 Java(client-java), Spring(client-spring), Spring Security(client-spring-security) 三种客户端。
+* 使用单机完成了三个客户端的 SSO (client-java & client-spring & client-spring-security）。
+* 使用多机完成了二个客户端的 SSO (client-java & client-spring）。
 * CAS without SSL 。
 
 ## 相关软件 ##
@@ -89,6 +90,8 @@
     ENGINE = InnoDB;
 
     INSERT INTO `cas`.`users` (`username`, `password`) VALUES ('admin', 'e10adc3949ba59abbe56e057f20f883e');
+    INSERT INTO `cas`.`users` (`username`, `password`) VALUES ('rod', 'e10adc3949ba59abbe56e057f20f883e');
+
 
 运行 mvn package 之后，把 cas.war 放到 Tomcat 中，使用 admin/123456 登录。
 
@@ -233,7 +236,46 @@
 访问 `http://IP:8080/cas/login` ，使用之前的帐号密码可以登录。在登录界面，CAS 会警告 `Non-secure Connection
 You are currently accessing CAS over a non-secure connection. 
 Single Sign On WILL NOT WORK. In order to have single sign on work, 
-you MUST log in over HTTPS.` 这个可以忽略。同时修改所有 Client 的配置，都改为 IP 就可以了。    
+you MUST log in over HTTPS.` 这个可以忽略。同时修改所有 Client 的配置，都改为 IP 就可以了。
+
+## client-spring-security ##
+
+我们知道，Spring Security 本身已经支持各种方式的认证（内存、数据库、LDAP...）。
+前边的 `client-java`, `client-spring` 都没有自己的认证模块，完全依赖于 CAS Server。
+对于遗留系统，已经拥有自己的用户数据库，也有自己的认证模块。`client-spring-security` 主要演示了在这种场景下如何整合。
+
+首先，我们假设遗留系统已经存在用户表 users 和权限表 authorities：
+
+    CREATE DATABASE cas_ss;
+
+    CREATE TABLE `users` (
+      `username` varchar(45) NOT NULL,
+      `password` varchar(45) DEFAULT NULL,
+      `enabled` varchar(10) NOT NULL,
+      PRIMARY KEY (`username`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+    INSERT INTO `users` VALUES ('admin', 'e10adc3949ba59abbe56e057f20f883e', 'true');
+    INSERT INTO `users` VALUES ('rod', 'e10adc3949ba59abbe56e057f20f883e', 'true');
+
+    CREATE TABLE `authorities` (
+      `username` varchar(45) NOT NULL,
+      `authority` varchar(45) DEFAULT NULL,
+      KEY `fk_authorities_users` (`username`),
+      CONSTRAINT `fk_authorities_users` FOREIGN KEY (`username`) REFERENCES `users` (`username`) ON DELETE NO ACTION ON UPDATE NO ACTION
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+    INSERT INTO `authorities` VALUES ('admin', 'ROLE_USER'), ('admin', 'ROLE_SUPERVISOR');
+    INSERT INTO `authorities` VALUES ('rod', 'ROLE_USER');
+
+然后运行 mvn jetty:run，访问 http://localhost:8081/，分别用 `admin` 和 `rod` 登录，Spring Security 的授权已经生效。
+
+这里实现整合的原则就是：
+
+* username 全局唯一，并且各业务系统保持和 CAS Server 数据库的同步（CAS 提供一个同步帐号密码的接口）。
+* 当某一个业务系统密码改变以后，也需要同步到 CAS Server 数据库（CAS 提供一个修改密码的接口）。
+* 当访问系统中任意需要认证的页面时，会自动跳转到 CAS Server 端的登录页面。
+* 认证完成后，CAS 会跳转回你之前需要访问的系统，由业务系统自己完成权限授权（比如这里的：authorities）。
 
 ## 参考文档 ##
 * [CAS User Manual](https://wiki.jasig.org/display/CASUM/Home)
