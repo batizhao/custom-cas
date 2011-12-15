@@ -105,7 +105,7 @@
 
                 <bean class="org.jasig.cas.adaptors.jdbc.QueryDatabaseAuthenticationHandler">
                     <property name="sql">
-                        <value>select password from users where id = lower(?)</value>
+                        <value>select password from users where username = lower(?)</value>
                     </property>
                     <property name="dataSource" ref="dataSource"/>
                     <property name="passwordEncoder" ref="passwordEncoder"/>

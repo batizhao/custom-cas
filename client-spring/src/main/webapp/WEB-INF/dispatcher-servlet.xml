@@ -6,7 +6,6 @@
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
        default-lazy-init="true">
 
-    <!-- 这段和sitemesh装饰器冲突，不能排除"/"，所以在decorators中不能使用"/*" -->
     <mvc:view-controller path="/" view-name="index"/>
 
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">

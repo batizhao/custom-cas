@@ -83,12 +83,12 @@
 
     CREATE DATABASE cas;
     CREATE  TABLE `cas`.`users` (
-      `id` VARCHAR(45) NOT NULL ,
+      `username` VARCHAR(45) NOT NULL ,
       `password` VARCHAR(45) NULL ,
-      PRIMARY KEY (`id`) )
+      PRIMARY KEY (`username`) )
     ENGINE = InnoDB;
 
-    INSERT INTO `cas`.`users` (`id`, `password`) VALUES ('admin', 'e10adc3949ba59abbe56e057f20f883e');
+    INSERT INTO `cas`.`users` (`username`, `password`) VALUES ('admin', 'e10adc3949ba59abbe56e057f20f883e');
 
 运行 mvn package 之后，把 cas.war 放到 Tomcat 中，使用 admin/123456 登录。
 

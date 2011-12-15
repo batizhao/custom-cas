@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:sec="http://www.springframework.org/schema/security"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd">
+
+    <sec:http entry-point-ref="casProcessingFilterEntryPoint">
+        <sec:intercept-url pattern="/secure/extreme/**" access="ROLE_SUPERVISOR" requires-channel="http"/>
+        <sec:intercept-url pattern="/secure/**" access="ROLE_USER"/>
+        <sec:logout logout-success-url="/cas-logout.jsp"/>
+        <sec:custom-filter ref="requestSingleLogoutFilter" before="LOGOUT_FILTER"/>
+        <sec:custom-filter ref="singleLogoutFilter" before="CAS_FILTER"/>
+        <sec:custom-filter ref="casAuthenticationFilter" after="CAS_FILTER"/>
+    </sec:http>
+
+    <!-- 客户端配置 -->
+    <bean id="serviceProperties" class="org.springframework.security.cas.ServiceProperties">
+        <property name="service" value="http://localhost:8081/j_spring_cas_security_check"/>
+        <property name="sendRenew" value="false"/>
+    </bean>
+
+    <!-- CAS 认证入口 -->
+    <bean id="casProcessingFilterEntryPoint" class="org.springframework.security.cas.web.CasAuthenticationEntryPoint">
+        <property name="loginUrl" value="http://localhost:8080/cas/login"/>
+        <property name="serviceProperties" ref="serviceProperties"/>
+    </bean>
+
+    <!-- CAS 认证过滤器，认证管理器、成功、失败配置 -->
+    <bean id="casAuthenticationFilter" class="org.springframework.security.cas.web.CasAuthenticationFilter">
+        <property name="authenticationManager" ref="authenticationManager"/>
+        <property name="authenticationFailureHandler">
+            <bean class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
+                <property name="defaultFailureUrl" value="/casfailed.jsp"/>
+            </bean>
+        </property>
+        <property name="authenticationSuccessHandler">
+            <bean class="org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler">
+                <property name="defaultTargetUrl" value="/"/>
+            </bean>
+        </property>
+    </bean>
+
+    <sec:authentication-manager alias="authenticationManager">
+        <sec:authentication-provider ref="casAuthenticationProvider">
+            <sec:password-encoder hash="md5"/>
+        </sec:authentication-provider>
+    </sec:authentication-manager>
+
+    <!-- 基于内存的认证 -->
+    <!--<sec:user-service id="userService">
+        <sec:user name="admin" password="123456" authorities="ROLE_SUPERVISOR,ROLE_USER"/>
+        <sec:user name="dianne" password="dianne" authorities="ROLE_USER"/>
+        <sec:user name="scott" password="scott" authorities="ROLE_USER"/>
+    </sec:user-service>-->
+
+    <!-- 自定义的认证1，需要自己实现 UserDetailsServices -->
+    <!--<bean id="userService" class="me.batizhao.MyUserDetailsServices"/>-->
+
+    <!-- 自定义的认证2，需要实现两个 Sql -->
+    <bean id="userService" class="org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="usersByUsernameQuery">
+            <value>
+                SELECT username AS username, password AS password, 'true' AS enabled
+                FROM users
+                WHERE username = lower(?)
+            </value>
+        </property>
+        <property name="authoritiesByUsernameQuery">
+            <value>
+                SELECT username, authority
+                FROM authorities
+                WHERE username = lower(?)
+            </value>
+        </property>
+    </bean>
+
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName">
+            <value>com.mysql.jdbc.Driver</value>
+        </property>
+        <property name="url">
+            <value>jdbc:mysql://localhost:3306/cas_ss</value>
+        </property>
+        <property name="username">
+            <value>root</value>
+        </property>
+        <property name="password">
+            <value>root</value>
+        </property>
+    </bean>
+
+    <bean id="casAuthenticationProvider"
+          class="org.springframework.security.cas.authentication.CasAuthenticationProvider">
+        <property name="authenticationUserDetailsService">
+            <bean class="org.springframework.security.core.userdetails.UserDetailsByNameServiceWrapper">
+                <constructor-arg ref="userService"/>
+            </bean>
+        </property>
+        <property name="serviceProperties" ref="serviceProperties"/>
+        <property name="ticketValidator">
+            <bean class="org.jasig.cas.client.validation.Cas20ServiceTicketValidator">
+                <constructor-arg index="0" value="http://localhost:8080/cas"/>
+            </bean>
+        </property>
+        <property name="key" value="an_id_for_this_auth_provider_only"/>
+    </bean>
+
+    <!-- This filter redirects to the CAS Server to signal Single Logout should be performed -->
+    <bean id="requestSingleLogoutFilter"
+          class="org.springframework.security.web.authentication.logout.LogoutFilter">
+        <constructor-arg value="http://localhost:8080/cas/logout"/>
+        <constructor-arg>
+            <bean class="org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler"/>
+        </constructor-arg>
+        <property name="filterProcessesUrl" value="/j_spring_cas_security_logout"/>
+    </bean>
+    <!-- This filter handles a Single Logout Request from the CAS Server -->
+    <bean id="singleLogoutFilter" class="org.jasig.cas.client.session.SingleSignOutFilter"/>
+
+    <bean class="org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler"/>
+
+</beans>

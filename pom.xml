@@ -29,6 +29,7 @@
         <module>server-jdbc</module>
         <module>client-java</module>
         <module>client-spring</module>
+        <module>client-spring-security</module>
     </modules>
 
     <dependencies>
