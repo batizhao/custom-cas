@@ -7,8 +7,8 @@
 
 * 实现了 Generic(server-generic), Jdbc(server-jdbc) 两种 Authentication 。
 * 实现了 Java(client-java), Spring(client-spring), Spring Security(client-spring-security) 三种客户端。
-* 使用单机完成了三个客户端的 SSO (client-java & client-spring & client-spring-security）。
-* 使用多机完成了二个客户端的 SSO (client-java & client-spring）。
+* 使用单机完成了三个客户端的 SSO 。
+* 使用多机完成了三个客户端的 SSO 。
 * CAS without SSL 。
 
 ## 相关软件 ##
@@ -16,6 +16,8 @@
 * cas-client-core 3.2.0
 * maven3
 * jdk6
+* spring 3.0.5.RELEASE
+* spring security 3.0.6.RELEASE
 * tomcat7
 
 ## CAS Server 配置 ##
@@ -137,9 +139,9 @@
 * 任意登录其中之一，然后在浏览器直接输入另外一个地址，可以看到已经不需要登录。
 * Single Sign Out: https://localhost:8443/cas/logout（Spring 客户端的 logout 好像不起作用，Java 客户端没问题）
 
-## 三台机器 SSO ##
+## 四台机器 SSO ##
 
-修改 hosts 文件（三台机器都增加以下内容）：
+修改 hosts 文件（四台机器都增加以下内容）：
 
     # CAS Server
     10.4.251.149 batizhao
@@ -149,6 +151,9 @@
 
     # CAS Client for Spring
     10.4.247.95 client-spring
+    
+    # CAS Client for Spring Security
+    10.4.247.96 client-spring-security
 
 根据域名重新生成证书（在这里只能使用域名，不可以使用 IP，否则会抛出异常）。在使用之前删除原证书（如果 alias 不变）：
 
@@ -202,8 +207,15 @@
             </bean>
         </property>
     </bean>
+    
+修改 `client-spring-security` applicationContext-security.xml 为以下内容，其余都替换为 Server 地址。
 
-对 jsp 文件稍作修改，在三台机器任意一台登录客户端测试。
+    <bean id="serviceProperties" class="org.springframework.security.cas.ServiceProperties">
+        <property name="service" value="http://client-spring-security/j_spring_cas_security_check"/>
+        <property name="sendRenew" value="false"/>
+    </bean>
+
+对 jsp 文件稍作修改，在四台机器任意一台登录客户端测试。
 
 ## CAS without SSL ##
 
@@ -268,13 +280,14 @@ you MUST log in over HTTPS.` 这个可以忽略。同时修改所有 Client 的�
     INSERT INTO `authorities` VALUES ('admin', 'ROLE_USER'), ('admin', 'ROLE_SUPERVISOR');
     INSERT INTO `authorities` VALUES ('rod', 'ROLE_USER');
 
-然后运行 mvn jetty:run，访问 http://localhost:8081/，分别用 `admin` 和 `rod` 登录，Spring Security 的授权已经生效。
+这里可以不用部署到 Tomcat，直接运行 mvn jetty:run，访问 http://localhost:8081/，分别用 `admin` 和 `rod` 登录，
+在 CAS 认证完成后转到应用首页，Spring Security 的授权已经生效。
 
 这里实现整合的原则就是：
 
 * username 全局唯一，并且各业务系统保持和 CAS Server 数据库的同步（CAS 提供一个同步帐号密码的接口）。
 * 当某一个业务系统密码改变以后，也需要同步到 CAS Server 数据库（CAS 提供一个修改密码的接口）。
-* 当访问系统中任意需要认证的页面时，会自动跳转到 CAS Server 端的登录页面。
+* 当首次访问系统中任意需要认证的页面时，会自动跳转到 CAS Server 端的登录页面。
 * 认证完成后，CAS 会跳转回你之前需要访问的系统，由业务系统自己完成权限授权（比如这里的：authorities）。
 
 ## 参考文档 ##
