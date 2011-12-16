@@ -10,6 +10,7 @@
 * 使用单机完成了三个客户端的 SSO 。
 * 使用多机完成了三个客户端的 SSO 。
 * CAS without SSL 。
+* 整合遗留系统。
 
 ## 相关软件 ##
 * cas-server-3.4.11
@@ -282,13 +283,140 @@ you MUST log in over HTTPS.` 这个可以忽略。同时修改所有 Client 的�
 
 这里可以不用部署到 Tomcat，直接运行 mvn jetty:run，访问 http://localhost:8081/，分别用 `admin` 和 `rod` 登录，
 在 CAS 认证完成后转到应用首页，Spring Security 的授权已经生效。
+ 
+## 整合遗留系统 ##
 
-这里实现整合的原则就是：
+### Spring Security 应用 ###
+
+如果你的系统是基于 Spring Security 构建，那整合 CAS 就非常容易，基本改几个配置就可以。
+如果你的项目基于 Maven ，只要在 pom.xml 文件中增加
+
+    <dependency>
+        <groupId>org.springframework.security</groupId>
+        <artifactId>spring-security-cas-client</artifactId>
+        <version>${spring.version}</version>
+    </dependency>
+    
+如果你的 *-servlet.xml 文件中有配置 `path="/"` 神马的，把他注释掉。比如下边的代码。
+
+    <!--<mvc:view-controller path="/" view-name="login"/>-->
+
+打开你的 applicationContext-security.xml，基本配置如下：
+
+    <?xml version="1.0" encoding="UTF-8"?>
+    <beans:beans xmlns="http://www.springframework.org/schema/security"
+        xmlns:beans="http://www.springframework.org/schema/beans"
+    	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+    		http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd">
+    
+    	<http auto-config="false" use-expressions="true" entry-point-ref="casProcessingFilterEntryPoint">
+            <intercept-url pattern="/statics/**" filters="none"/>            
+            <intercept-url pattern="/**" access="isAuthenticated()"/>
+            <logout logout-success-url="/cas-logout.jsp"/>
+    
+            <custom-filter ref="requestSingleLogoutFilter" before="LOGOUT_FILTER"/>
+            <custom-filter ref="singleLogoutFilter" before="CAS_FILTER"/>
+            <custom-filter ref="casAuthenticationFilter" after="CAS_FILTER"/>                        
+        </http>
+    	
+    	<!-- 动态设置登录成功以后跳转的页面 -->
+        <beans:bean id="authenticationSuccessHandler" class="me.batizhao.security.MyAuthenticationSuccessHandler">
+            <beans:property name="alwaysUseDefaultTargetUrl" value="false"/>
+        </beans:bean>
+    
+    	<!-- 定义用户的细节 -->
+        <beans:bean id="userDetailService" class="me.batizhao.security.UserDetailsService"/>	 
+    
+        <!-- 客户端配置 -->
+        <beans:bean id="serviceProperties" class="org.springframework.security.cas.ServiceProperties">
+            <beans:property name="service" value="http://localhost:9082/j_spring_cas_security_check"/>
+            <beans:property name="sendRenew" value="false"/>
+        </beans:bean>
+    
+        <!-- CAS 认证入口 -->
+        <beans:bean id="casProcessingFilterEntryPoint" class="org.springframework.security.cas.web.CasAuthenticationEntryPoint">
+            <beans:property name="loginUrl" value="http://localhost:8080/cas/login"/>
+            <beans:property name="serviceProperties" ref="serviceProperties"/>
+        </beans:bean>
+    
+        <!-- CAS 认证过滤器，认证管理器、成功、失败配置 -->
+        <beans:bean id="casAuthenticationFilter" class="org.springframework.security.cas.web.CasAuthenticationFilter">
+            <beans:property name="authenticationManager" ref="authenticationManager"/>
+            <beans:property name="authenticationFailureHandler">
+                <beans:bean class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
+                    <beans:property name="defaultFailureUrl" value="/casfailed.jsp"/>
+                </beans:bean>
+            </beans:property>
+            <!-- 登录成功后的页面，如果是固定的。否则 ref="authenticationSuccessHandler" -->
+            <beans:property name="authenticationSuccessHandler" ref="authenticationSuccessHandler">                
+                <!--<beans:bean class="org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler">
+                    <beans:property name="defaultTargetUrl" value="/home"/>
+                </beans:bean>-->
+            </beans:property>
+        </beans:bean>
+    
+        <authentication-manager alias="authenticationManager">
+            <authentication-provider ref="casAuthenticationProvider">
+                <password-encoder hash="md5"/>
+            </authentication-provider>
+        </authentication-manager>
+    
+        <beans:bean id="casAuthenticationProvider"
+              class="org.springframework.security.cas.authentication.CasAuthenticationProvider">
+            <beans:property name="authenticationUserDetailsService">
+                <beans:bean class="org.springframework.security.core.userdetails.UserDetailsByNameServiceWrapper">
+                    <beans:constructor-arg ref="userDetailService"/>
+                </beans:bean>
+            </beans:property>
+            <beans:property name="serviceProperties" ref="serviceProperties"/>
+            <beans:property name="ticketValidator">
+                <beans:bean class="org.jasig.cas.client.validation.Cas20ServiceTicketValidator">
+                    <beans:constructor-arg index="0" value="http://localhost:8080/cas"/>
+                </beans:bean>
+            </beans:property>
+            <beans:property name="key" value="an_id_for_this_auth_provider_only"/>
+        </beans:bean>
+    
+        <beans:bean id="requestSingleLogoutFilter"
+              class="org.springframework.security.web.authentication.logout.LogoutFilter">
+            <beans:constructor-arg value="http://localhost:8080/cas/logout"/>
+            <beans:constructor-arg>
+                <beans:bean class="org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler"/>
+            </beans:constructor-arg>
+            <beans:property name="filterProcessesUrl" value="/j_spring_cas_security_logout"/>
+        </beans:bean>
+        
+        <beans:bean id="singleLogoutFilter" class="org.jasig.cas.client.session.SingleSignOutFilter"/>
+    
+    </beans:beans>
+    
+实现登录后自定义的跳转处理：
+
+    public class MyAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {           
+    
+        @Override
+        public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
+                throws IOException, ServletException {
+    
+            User user = (User) authentication.getPrincipal();            
+            HttpSession session = request.getSession();
+            session.setAttribute(Constants.CURRENT_USER, user);
+            session.setAttribute(Constants.ENTITIES, entities);
+    
+            if (authentication != null) {
+                setDefaultTargetUrl(getDefaultUrl(user.getUserId()));
+                super.onAuthenticationSuccess(request, response, authentication);
+            }
+        }    
+    }
+    
+这样配置就基本完成了。这里实现整合的原则就是：
 
 * username 全局唯一，并且各业务系统保持和 CAS Server 数据库的同步（CAS 提供一个同步帐号密码的接口）。
 * 当某一个业务系统密码改变以后，也需要同步到 CAS Server 数据库（CAS 提供一个修改密码的接口）。
 * 当首次访问系统中任意需要认证的页面时，会自动跳转到 CAS Server 端的登录页面。
-* 认证完成后，CAS 会跳转回你之前需要访问的系统，由业务系统自己完成权限授权（比如这里的：authorities）。
+* 认证完成后，CAS 会跳转回你之前需要访问的系统，由业务系统自己完成授权（比如前边的表：authorities）。    
 
 ## 参考文档 ##
 * [CAS User Manual](https://wiki.jasig.org/display/CASUM/Home)
