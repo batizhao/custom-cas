@@ -5,7 +5,7 @@
 (https://wiki.jasig.org/display/CASUM/Best+Practice+-+Setting+Up+CAS+Locally+using+the+Maven2+WAR+Overlay+Method) 为指导，
 后续又作了很多扩展。主要内容包括：
 
-* 实现了 Generic(server-generic), Jdbc(server-jdbc) 两种 Authentication 。
+* 实现了 Generic(server-generic), Jdbc(server-jdbc), LDAP(server-ldap) 三种 Authentication 。
 * 实现了 Java(client-java), Spring(client-spring), Spring Security(client-spring-security) 三种客户端。
 * 使用单机完成了三个客户端的 SSO 。
 * 使用多机完成了三个客户端的 SSO 。
@@ -99,6 +99,10 @@
 运行 mvn package 之后，把 cas.war 放到 Tomcat 中，使用 admin/123456 登录。
 
 这里对密码 `123456` 做了 MD5 加密，如果在 authenticationHandlers 中去掉 `passwordEncoder` 这个属性，就可以使用明码登录。
+
+### LDAP Authentication ###
+
+请参考[这里](https://wiki.jasig.org/display/CASUM/LDAP)
 
 ### 实现 Single Sign Out 后返回到自定义页面 ###
 
