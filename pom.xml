@@ -27,9 +27,11 @@
     <modules>
         <module>server-generic</module>
         <module>server-jdbc</module>
+        <module>server-ldap</module>
         <module>client-java</module>
         <module>client-spring</module>
         <module>client-spring-security</module>
+
     </modules>
 
     <dependencies>
