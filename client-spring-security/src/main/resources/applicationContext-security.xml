@@ -15,9 +15,14 @@
         <sec:custom-filter ref="casAuthenticationFilter" after="CAS_FILTER"/>
     </sec:http>
 
+    <!-- 动态设置登录成功以后跳转的页面 -->
+    <!--<bean id="authenticationSuccessHandler" class="me.batizhao.security.MyAuthenticationSuccessHandler">
+        <property name="alwaysUseDefaultTargetUrl" value="false"/>
+    </bean>-->
+
     <!-- 客户端配置 -->
     <bean id="serviceProperties" class="org.springframework.security.cas.ServiceProperties">
-        <property name="service" value="http://localhost:8081/j_spring_cas_security_check"/>
+        <property name="service" value="http://localhost:8080/client-spring-security/j_spring_cas_security_check"/>
         <property name="sendRenew" value="false"/>
     </bean>
 
@@ -35,6 +40,7 @@
                 <property name="defaultFailureUrl" value="/casfailed.jsp"/>
             </bean>
         </property>
+        <!-- 登录成功后的页面，如果是固定的。否则 ref="authenticationSuccessHandler" -->
         <property name="authenticationSuccessHandler">
             <bean class="org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler">
                 <property name="defaultTargetUrl" value="/"/>
@@ -43,10 +49,29 @@
     </bean>
 
     <sec:authentication-manager alias="authenticationManager">
-        <sec:authentication-provider ref="casAuthenticationProvider">
-            <sec:password-encoder hash="md5"/>
-        </sec:authentication-provider>
+        <sec:authentication-provider ref="casAuthenticationProvider"/>
     </sec:authentication-manager>
+
+    <bean id="casAuthenticationProvider"
+          class="org.springframework.security.cas.authentication.CasAuthenticationProvider">
+        <property name="authenticationUserDetailsService" ref="authenticationUserDetailsService"/>
+        <property name="serviceProperties" ref="serviceProperties"></property>
+        <property name="ticketValidator">
+            <bean class="org.jasig.cas.client.validation.Cas20ServiceTicketValidator">
+                <constructor-arg index="0" value="http://localhost:8080/cas"/>
+            </bean>
+        </property>
+        <property name="key" value="cas"></property>
+    </bean>
+
+    <bean id="authenticationUserDetailsService"
+          class="org.springframework.security.cas.userdetails.GrantedAuthorityFromAssertionAttributesUserDetailsService">
+        <constructor-arg>
+            <array>
+                <value>authorities</value>
+            </array>
+        </constructor-arg>
+    </bean>
 
     <!-- 基于内存的认证 -->
     <!--<sec:user-service id="userService">
@@ -59,7 +84,7 @@
     <!--<bean id="userService" class="me.batizhao.MyUserDetailsServices"/>-->
 
     <!-- 自定义的认证2，需要实现两个 Sql -->
-    <bean id="userService" class="org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl">
+    <!--<bean id="userService" class="org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl">
         <property name="dataSource" ref="dataSource"/>
         <property name="usersByUsernameQuery">
             <value>
@@ -106,7 +131,7 @@
             </bean>
         </property>
         <property name="key" value="an_id_for_this_auth_provider_only"/>
-    </bean>
+    </bean>-->
 
     <!-- This filter redirects to the CAS Server to signal Single Logout should be performed -->
     <bean id="requestSingleLogoutFilter"

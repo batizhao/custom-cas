@@ -90,8 +90,8 @@
                         | edu.someschool.its.cas.MySpecialHandler here, or you might use one of the handlers provided in the adaptors modules.
                         +-->
                 <bean class="org.jasig.cas.adaptors.ldap.BindLdapAuthenticationHandler"
-                      p:filter="cn=%u"
-                      p:searchBase="dc=batizhao,dc=me"
+                      p:filter="uid=%u"
+                      p:searchBase="dc=example,dc=com"
                       p:contextSource-ref="contextSource"
                       p:searchContextSource-ref="pooledContextSource"
                       p:ignorePartialResultException="true"/>
@@ -103,7 +103,7 @@
         <property name="pooled" value="true"/>
         <property name="url" value="ldap://127.0.0.1:1389"/>
         <property name="userDn" value="cn=Directory Manager"/>
-        <property name="password" value="123456"/>
+        <property name="password" value="password"/>
         <property name="baseEnvironmentProperties">
             <map>
                 <entry key="com.sun.jndi.ldap.connect.timeout" value="3000"/>
