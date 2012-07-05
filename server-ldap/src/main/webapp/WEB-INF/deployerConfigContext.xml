@@ -91,10 +91,16 @@
                         +-->
                 <bean class="org.jasig.cas.adaptors.ldap.BindLdapAuthenticationHandler"
                       p:filter="uid=%u"
-                      p:searchBase="dc=example,dc=com"
+                      p:searchBase="dc=shanghai,dc=gov,dc=cn"
                       p:contextSource-ref="contextSource"
                       p:searchContextSource-ref="pooledContextSource"
                       p:ignorePartialResultException="true"/>
+            </list>
+        </property>
+
+        <property name="authenticationMetaDataPopulators">
+            <list>
+                <bean class="org.jasig.cas.authentication.SamlAuthenticationMetaDataPopulator"/>
             </list>
         </property>
     </bean>

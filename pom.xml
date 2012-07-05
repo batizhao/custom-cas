@@ -12,7 +12,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <cas.version>3.4.11</cas.version>
+        <cas.version>3.4.12</cas.version>
     </properties>
 
     <licenses>
