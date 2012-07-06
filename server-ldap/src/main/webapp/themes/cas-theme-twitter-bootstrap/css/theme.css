@@ -1,0 +1,440 @@
+/*!
+ * jQuery UI Bootstrap (0.22)
+ * http://addyosmani.github.com/jquery-ui-bootstrap
+ *
+ * Copyright 2012, Addy Osmani
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ *
+ * Portions copyright jQuery UI & Twitter Bootstrap
+ */
+/* Override some defaults */
+html, body {
+    background-color: #eee;
+}
+
+body {
+    padding-top: 40px; /* 40px to make the container go all the way to the bottom of the topbar */
+}
+
+.container {
+    width: 820px; /* downsize our container to make the content feel a bit tighter and more cohesive. NOTE: this removes two full columns from the grid, meaning you only go to 14 columns and not 16. */
+}
+
+/* The white background content wrapper */
+.container > .content {
+    background-color: #fff;
+    padding: 20px;
+    margin: 0 -20px; /* negative indent the amount of the padding to maintain the grid system */
+    -webkit-border-radius: 0 0 6px 6px;
+    -moz-border-radius: 0 0 6px 6px;
+    border-radius: 0 0 6px 6px;
+    -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, .15);
+    -moz-box-shadow: 0 1px 2px rgba(0, 0, 0, .15);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .15);
+}
+
+/* Styles you shouldn't keep as they are for displaying this base example only */
+.content .span10,
+.content .span4 {
+    min-height: 500px;
+}
+
+/* Give a quick and non-cross-browser friendly divider */
+.content .span4 {
+    margin-left: 0;
+    padding-left: 19px;
+    border-left: 1px solid #eee;
+}
+
+.span10 {
+    width: 500px;
+    margin-right: 10px;
+}
+
+.span4 {
+    width: 290px;
+}
+
+/* Tweak navbar brand link to be super sleek
+-------------------------------------------------- */
+.navbar-fixed-top .brand {
+    padding-right: 0;
+    padding-left: 0;
+    margin-left: 20px;
+    float: right;
+    font-weight: bold;
+    color: #000;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, .1), 0 0 30px rgba(255, 255, 255, .125);
+    -webkit-transition: all .2s linear;
+    -moz-transition: all .2s linear;
+    transition: all .2s linear;
+}
+
+.navbar-fixed-top .brand:hover {
+    text-decoration: none;
+}
+
+/* Fixed subnav on scroll, but only for 980px and up (sorry IE!) */
+@media (min-width: 980px) {
+    .subnav-fixed {
+        position: fixed;
+        top: 40px;
+        left: 0;
+        right: 0;
+        z-index: 1020; /* 10 less than .navbar-fixed to prevent any overlap */
+        border-color: #d5d5d5;
+        border-width: 0 0 1px; /* drop the border on the fixed edges */
+        -webkit-border-radius: 0;
+        -moz-border-radius: 0;
+        border-radius: 0;
+        -webkit-box-shadow: inset 0 1px 0 #fff, 0 1px 5px rgba(0, 0, 0, .1);
+        -moz-box-shadow: inset 0 1px 0 #fff, 0 1px 5px rgba(0, 0, 0, .1);
+        box-shadow: inset 0 1px 0 #fff, 0 1px 5px rgba(0, 0, 0, .1);
+        filter: progid:DXImageTransform.Microsoft.gradient(enabled = false); /* IE6-9 */
+    }
+
+    .subnav-fixed .nav {
+        width: 938px;
+        margin: 0 auto;
+        padding: 0 1px;
+    }
+
+    .subnav .nav > li:first-child > a,
+    .subnav .nav > li:first-child > a:hover {
+        -webkit-border-radius: 0;
+        -moz-border-radius: 0;
+        border-radius: 0;
+    }
+}
+
+/* Responsive Docs
+-------------------------------------------------- */
+@media (max-width: 480px) {
+
+    /* Reduce padding above jumbotron */
+    body {
+        padding-top: 70px;
+    }
+
+    /* Change up some type stuff */
+    h2 {
+        margin-top: 27px;
+    }
+
+    h2 small {
+        display: block;
+        line-height: 18px;
+    }
+
+    h3 {
+        margin-top: 18px;
+    }
+
+    /* icons */
+    .marketing .bs-icon {
+        margin: 0;
+    }
+
+    /* Adjust the jumbotron */
+    .jumbotron h1,
+    .jumbotron p {
+        text-align: center;
+        margin-right: 0;
+    }
+
+    .jumbotron h1 {
+        font-size: 45px;
+        margin-right: 0;
+    }
+
+    .jumbotron p {
+        margin-right: 0;
+        margin-left: 0;
+        font-size: 18px;
+        line-height: 24px;
+    }
+
+    .jumbotron .btn {
+        display: block;
+        font-size: 18px;
+        padding: 10px 14px;
+        margin: 0 auto 10px;
+    }
+
+    /* Masthead (home page jumbotron) */
+    .masthead {
+        padding-top: 0;
+    }
+
+    /* Don't space out quick links so much */
+    .quick-links {
+        margin: 40px 0 0;
+    }
+
+    /* hide the bullets on mobile since our horizontal space is limited */
+    .quick-links .divider {
+        display: none;
+    }
+
+    /* center example sites */
+    .example-sites {
+        margin-left: 0;
+    }
+
+    .example-sites > li {
+        float: none;
+        display: block;
+        max-width: 280px;
+        margin: 0 auto 18px;
+        text-align: center;
+    }
+
+    .example-sites .thumbnail > img {
+        max-width: 270px;
+    }
+
+    table code {
+        white-space: normal;
+        word-wrap: break-word;
+        word-break: break-all;
+    }
+
+    /* Modal example */
+    .modal-example .modal {
+        position: relative;
+        top: auto;
+        right: auto;
+        bottom: auto;
+        left: auto;
+    }
+
+}
+
+@media (max-width: 768px) {
+
+    /* Remove any padding from the body */
+    body {
+        padding-top: 0;
+    }
+
+    /* Jumbotron buttons */
+    .jumbotron .btn {
+        margin-bottom: 10px;
+    }
+
+    /* Subnav */
+    .subnav {
+        position: static;
+        top: auto;
+        z-index: auto;
+        width: auto;
+        height: auto;
+        background: #fff; /* whole background property since we use a background-image for gradient */
+        -webkit-box-shadow: none;
+        -moz-box-shadow: none;
+        box-shadow: none;
+    }
+
+    .subnav .nav > li {
+        float: none;
+    }
+
+    .subnav .nav > li > a {
+        border: 0;
+    }
+
+    .subnav .nav > li + li > a {
+        border-top: 1px solid #e5e5e5;
+    }
+
+    .subnav .nav > li:first-child > a,
+    .subnav .nav > li:first-child > a:hover {
+        -webkit-border-radius: 4px 4px 0 0;
+        -moz-border-radius: 4px 4px 0 0;
+        border-radius: 4px 4px 0 0;
+    }
+
+    /* Popovers */
+    .large-bird {
+        display: none;
+    }
+
+    .popover-well .popover-wrapper {
+        margin-left: 0;
+    }
+
+    /* Space out the show-grid examples */
+    .show-grid [class*="span"] {
+        margin-bottom: 5px;
+    }
+
+    /* Unfloat the back to top link in footer */
+    .footer .pull-right {
+        float: none;
+    }
+
+    .footer p {
+        margin-bottom: 9px;
+    }
+
+}
+
+@media (min-width: 480px) and (max-width: 768px) {
+
+    /* Scale down the jumbotron content */
+    .jumbotron h1 {
+        font-size: 54px;
+    }
+
+    .jumbotron p {
+        margin-right: 0;
+        margin-left: 0;
+    }
+
+}
+
+@media (min-width: 768px) and (max-width: 980px) {
+
+    /* Remove any padding from the body */
+    body {
+        padding-top: 0;
+    }
+
+    /* Scale down the jumbotron content */
+    .jumbotron h1 {
+        font-size: 72px;
+    }
+
+}
+
+@media (max-width: 980px) {
+
+    /* Unfloat brand */
+    .navbar-fixed-top .brand {
+        float: left;
+        margin-left: 0;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    /* Inline-block quick links for more spacing */
+    .quick-links li {
+        display: inline-block;
+        margin: 5px;
+    }
+
+}
+
+/* LARGE DESKTOP SCREENS */
+@media (min-width: 1210px) {
+
+    /* Update subnav container */
+    .subnav-fixed .nav {
+        width: 1168px; /* 2px less to account for left/right borders being removed when in fixed mode */
+    }
+
+}
+
+/* Footer
+-------------------------------------------------- */
+.footer {
+    margin-top: 5px;
+    padding: 20px 0 20px;
+    text-align: center;
+    /*border-top: 1px solid #e5e5e5;*/
+}
+
+.footer p {
+    margin-bottom: 0;
+    color: #555;
+}
+
+/* Log In Form
+-------------------------------------------------- */
+#login #auth-form {
+    padding-top: 30px;
+}
+
+#login #auth-form form {
+    margin: 0;
+}
+
+.accounts-form {
+    width: 520px;
+    padding: 30px 0 0 0;
+    margin: 90px auto 30px;
+    background: #fff;
+    text-align: center;
+    box-shadow: 0 1px 6px #bbb;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.18);
+    border-radius: 2px;
+}
+
+.accounts-form h2 {
+    font-weight: 400;
+    letter-spacing: 0px;
+    font-size: 26px;
+    color: #222;
+    margin: 0px 10px 20px;
+}
+
+.accounts-form small {
+    color: #666;
+}
+
+.accounts-form .errorlist {
+    list-style: none;
+    margin: 0 95px 15px;
+}
+
+.accounts-form #auth-form {
+    background: #f4f4f4;
+    padding: 0 0 40px;
+    border-top: 1px solid #ddd;
+    margin: 0;
+    background-color: #f4f4f4;
+    background-image: -moz-linear-gradient(#fefefe, #f4f4f4);
+    background-image: -o-linear-gradient(#fefefe, #f4f4f4);
+    background-image: -ms-linear-gradient(#fefefe, #f4f4f4);
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #fefefe), color-stop(1, #f4f4f4));
+    background-image: -webkit-linear-gradient(#fefefe, #f4f4f4);
+    -moz-border-radius-bottomleft: 2px;
+    -webkit-border-bottom-left-radius: 2px;
+    -ms-border-bottom-left-radius: 2px;
+    -o-border-bottom-left-radius: 2px;
+    border-bottom-left-radius: 2px;
+    -moz-border-radius-bottomright: 2px;
+    -webkit-border-bottom-right-radius: 2px;
+    -ms-border-bottom-right-radius: 2px;
+    -o-border-bottom-right-radius: 2px;
+    border-bottom-right-radius: 2px;
+}
+
+.accounts-form #auth-form input[type=text], .accounts-form #auth-form input[type=password] {
+    font-size: 16px;
+    color: #000;
+    padding: 0.8em 0.8em;
+    width: 300px;
+    box-shadow: inset 0 1px 1px #ddd;
+}
+
+.accounts-form #auth-form .input {
+    margin-bottom: 15px;
+}
+
+.accounts-form #auth-form input[type=submit] {
+    padding: 15px 30px;
+    font-size: 16px;
+    padding: 0.8em 3em;
+    letter-spacing: 1px;
+}
+
+.note {
+    text-align: center;
+    color: #999;
+}
+
+.note a {
+    color: #666;
+    font-weight: bold;
+}

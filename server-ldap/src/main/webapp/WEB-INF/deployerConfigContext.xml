@@ -98,11 +98,11 @@
             </list>
         </property>
 
-        <property name="authenticationMetaDataPopulators">
+        <!--<property name="authenticationMetaDataPopulators">
             <list>
                 <bean class="org.jasig.cas.authentication.SamlAuthenticationMetaDataPopulator"/>
             </list>
-        </property>
+        </property>-->
     </bean>
 
     <bean id="contextSource" class="org.springframework.ldap.core.support.LdapContextSource">
@@ -154,7 +154,7 @@
     <!-- <sec:user name="@@THIS SHOULD BE REPLACED@@" password="notused" authorities="ROLE_ADMIN" />-->
 
     <sec:user-service id="userDetailsService">
-        <sec:user name="@@THIS SHOULD BE REPLACED@@" password="notused" authorities="ROLE_ADMIN"/>
+        <sec:user name="lisi" password="1" authorities="ROLE_ADMIN"/>
     </sec:user-service>
 
     <!--

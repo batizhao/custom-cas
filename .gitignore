@@ -12,3 +12,4 @@ nohup.out
 *.iml
 .DS_Store
 overlays
+*.log

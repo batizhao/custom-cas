@@ -1,7 +1,8 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <parent>
         <artifactId>custom-cas</artifactId>
         <groupId>me.batizhao</groupId>
@@ -12,10 +13,6 @@
     <artifactId>server-ldap</artifactId>
     <packaging>war</packaging>
     <name>custom-cas-server-ldap</name>
-
-    <build>
-        <finalName>cas</finalName>
-    </build>
 
     <dependencies>
         <dependency>
@@ -38,5 +35,41 @@
             <version>1.5.4</version>
         </dependency>
     </dependencies>
+
+    <build>
+        <finalName>cas</finalName>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+                <version>2.3.2</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.tomcat.maven</groupId>
+                <artifactId>tomcat6-maven-plugin</artifactId>
+                <version>2.0-beta-1</version>
+                <configuration>
+                    <port>8080</port>
+                    <path>/${project.build.finalName}</path>
+                    <warSourceDirectory>${project.build.directory}/${project.build.finalName}</warSourceDirectory>
+                    <!-- Remote Deploy Config-->
+                    <url>http://localhost:8080/manager/html</url>
+                    <username>tomcat</username>
+                    <password>S3cret</password>
+                </configuration>
+                <!--<executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>-->
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
