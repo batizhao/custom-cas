@@ -11,6 +11,7 @@
 * 使用多机完成了三个客户端的 SSO 。
 * CAS without SSL 。
 * 整合遗留系统。
+* [自定义 CAS 主题](http://batizhao.github.com/java/2012/07/06/custom-cas-theme/)
 
 ## 相关软件 ##
 * cas-server-3.4.11
