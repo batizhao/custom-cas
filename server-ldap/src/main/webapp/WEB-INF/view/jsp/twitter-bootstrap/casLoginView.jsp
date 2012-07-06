@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <%@ page contentType="text/html; charset=utf-8" %>
 <jsp:directive.include file="includes/taglibs.jsp"/>
-<spring:theme code="mobile.custom.css.file" var="mobileCss" text=""/>
 
 <html lang="utf-8">
 
